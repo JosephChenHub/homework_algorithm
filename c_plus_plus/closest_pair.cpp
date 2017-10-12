@@ -3,7 +3,8 @@
 #include<cmath>
 #include<ctime>
 
-#define NO_DISTANCE  9999999
+
+const size_t NO_DISTANCE = 9999999;
 
 struct point{
 float x;
@@ -17,16 +18,16 @@ public:
 		size = 0;
 		points = NULL;
 	}
-	Solution(int len) {
+	Solution(size_t len) {
 		m_distance = 0;
 		size = len;
 		points = new point[size];		
 	}
-	Solution(point * i_points, int len) {
+	Solution(point * i_points, size_t len) {
 		m_distance = 0;
 		size = len;
 		points = new point[size];
-	 	for(int i = 0; i < size; ++i)
+	 	for(size_t i = 0; i < size; ++i)
 		{
 			points[i] = i_points[i];
 
@@ -50,7 +51,7 @@ public:
 			<<"),("<<m_B.x<<","<<m_B.y<<")."<<std::endl;
 	}
 
-	void set_points(int len)
+	void set_points(size_t len)
 	{
 		if(size != 0)
 		{
@@ -60,7 +61,7 @@ public:
 		size = len;
 		points = new point[len];
 		srand(unsigned(time(NULL))); //random
-		for(int i = 0; i < len; ++i)
+		for(size_t i = 0; i < len; ++i)
 		{
 			points[i].x = (rand()%20000)/100.0-100;
 			points[i].y = (rand()%20000)/100.0-100;
@@ -77,14 +78,14 @@ public:
 		{	
 			std::cout<<"No points!"<<std::endl;
 		}
-		for(int i = 0; i < size; ++i)
+		for(size_t i = 0; i < size; ++i)
 		{
 			std::cout<<"("<<points[i].x<<","	\
 					<<points[i].y<<")"<<std::endl;
 		}
 	}
 private:
-	int size;
+	size_t size;
 	point *points;
 	point m_A;
 	point m_B;
@@ -106,14 +107,14 @@ private:
 		return a.y < b.y;
 	}
 
-	void rearrange(point *points,int len)
+	void rearrange(point *points,size_t len)
 	{
 		///sort by x-coordinate	
 		std::sort(points,points+len,compX); //pre-sort
 	}
 
 
-	float mini_dist(point *points,int len,point &pA, point &pB)
+	float mini_dist(point *points,size_t len,point &pA, point &pB)
 	{
 		if (len == 1)
 		{
@@ -133,11 +134,11 @@ private:
 		point *left = new point[len];
 		point *right = new point[len];
 
-		for(int i = 0; i < len/2; ++i)
+		for(size_t i = 0; i < len/2; ++i)
 		{
 			left[i] = points[i];
 		}
-		for(int j = 0, i = len/2; i < len; ++i)
+		for(size_t j = 0, i = len/2; i < len; ++i)
 		{
 			right[j++] = points[i];	
 		} 
@@ -161,8 +162,8 @@ private:
 	
 		///consider part between (l-delta,l+delta)
 		point *part = new point[len];
-		int num = 0; //length of the above part
-		for(int i = 0,num = 0; i < len; ++i)
+		size_t num = 0; //length of the above part
+		for(size_t i = 0,num = 0; i < len; ++i)
 		{
 			if(abs(points[i].x - mid) <= delta)
 			{	
@@ -173,9 +174,9 @@ private:
 		///sort by y-coordinate
 		std::sort(part,part+num,compY);
 		///scan
-		for(int i = 0; i < num; ++i)
+		for(size_t i = 0; i < num; ++i)
 		{
-			for(int j = i+1; j < num && j<= i+11 ;++j)
+			for(size_t j = i+1; j < num && j<= i+11 ;++j)
 			{
 				float temp = distance(part[i],part[j]);
 				if(temp < delta) //update distance
@@ -193,7 +194,7 @@ private:
 };
 
 
-int main()
+int main(int argc,char * argv[])
 {
 
 	Solution test;
