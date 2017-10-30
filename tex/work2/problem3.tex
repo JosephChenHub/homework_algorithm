@@ -1,0 +1,92 @@
+\section{Decoding}
+\begin{enumerate}[a).]
+	\item \textbf{description:}
+	\begin{itemize}
+		\item \textbf{Def.}\qquad$OPT(i)$ = the number of ways decoding a message $S_i=\left\lbrace s_1s_2...s_i\right\rbrace $.
+		\item \textbf{Given.}\quad an encoded message $S_n=\left\lbrace s_1s_2s_3...s_n\right\rbrace $.
+		\item \textbf{Goal.} \quad $OPT(n)$.
+	\end{itemize}
+	the all cases are showed below,
+	\begin{enumerate}[i.]
+		\item If $S_i$ is NULL or started with `$0$'($s_1 =$ `$0$'), it makes no sense,thus $OPT(i) = 0$;
+		\item If $i=1$ and $s_1 \neq$ `$0$', $OPT(i) = 1$;
+		\item If $i > 1$ and $s_1 \neq$ `$0$', define $OPT(0) =1$.
+		Consider $S_{k-1} = \left\lbrace s_1s_2...s_{k-1}\right\rbrace $ and
+		 $S_{k} = \left\lbrace s_1s_2...s_{k-1}s_{k}\right\rbrace $, $k > 1$.
+		 suppose that $S_{k-1}$ is valid (no isolated `$0$' in the decoded message),
+		\begin{itemize}
+			\item if $s_{k-1} =$ `$0$' and $s_k=$`$0$' ,$S_k$ is invalid,$OPT(k) = 0$.
+			\item if $s_{k-1} =$ `$0$' and $s_k\neq $`$0$' , $s_k$ can not be combined with $s_{k-1}$,
+			thus $OPT(k) = OPT(k-1)$.
+			\item if `$s_{k-1}s_k$'$>26$, $s_k$ should be isolated,
+			$OPT(k) = OPT(k-1)$.
+			\item if `$s_{k-1}s_k$ $\leq 26$, if $s_k = $`$0$',that means $s_{k-1}s_{k}$ should be regarded  as
+			a number,hence $OPT(k) = OPT(k-2)$;if $s_k \neq $`$0$', the result can be regarded as a combination of two part:
+			one part is just like decoding $S_{k-1}$ ($s_k$ is isolated),another part is
+			regarding $s_{k-1}s_{k}$ as a number,then there has no $s_{k-2}s_{k-1}$ and $s_{k-1}$ is
+			isolated in decoding $S_{k-1}$,
+			therefore $OPT(k) = OPT(k-1) + OPT(k-2)$.
+		\end{itemize}
+		
+	\end{enumerate}	
+In summary,to compute $OPT(n)$ (define $OPT(0)=1$),
+\[
+	OPT(n) = \left\lbrace \begin{split} 
+	0,	\quad&\text{if }S_n \text{ is NULL or } s_1 = \text{`}0\text{'} 
+	\text{ or `00' in } S_n \\
+	1, \quad&\text{else if } n = 1  \\
+	OPT(n-1),\quad	&\text{else if } n \geq 2 ,\text{`}s_{n-1}s_{n}\text{'} > 26 
+	\text{ or } s_{n-1} = \text{`}0\text{'} \\
+	OPT(n-2),\quad &\text{else if } n \geq 2,\text{`}s_{n-1}s_{n}\text{'} \leq 26 
+		\text{ and } s_n = \text{`}0\text{'} \\
+	OPT(n-1) + OPT(n-2), \quad&\text{else if } n \geq 2,\text{`}s_{n-1}s_{n}\text{'} \leq 26 
+	\text{ and } s_n \neq \text{`}0\text{'}
+	\end{split} \right . 
+\]	 
+	
+	\item \textbf{pseudo-code:}
+	\begin{algorithm}[H]
+		\caption{find the number of ways decoding a message}
+		\begin{algorithmic}[1]
+			\Require\quad{an encoded message $S_n=\left\lbrace s_1s_2...s_n\right\rbrace$}	
+			\Ensure {the number of ways decoding the message}	
+			\Function{NUM-DECODINGS}{$S_n$}
+				\If {$S_n$ is invalid}
+					\State \Return 0
+				\EndIf
+				\If {$n = 1$}
+					\State \Return 1
+				\EndIf 
+				\State initialize $M[n+1] = \left\lbrace 1,1,0,0...\right\rbrace $
+				\For {$i = 2$ to $n$}
+					 \If { $s_{i-1}s_{i}$ > 26 or $s_{i-1} =$ `$0$'}
+						 \If {$s_i =$ `$0$'}
+						  \State \Return 0
+						 \EndIf
+						 \State $M[i+1] = M[i]$
+					 \Else
+						\If {$s_i = $`$0$'}
+							\State $M[i+1] = M[i-1]$
+						\Else
+							\State $M[i+1] = M[i] + M[i-1]$
+						\EndIf 	 
+					 \EndIf
+					\EndFor
+			\State \Return $M[n+1]$
+		    \EndFunction 			
+		\end{algorithmic}
+	\end{algorithm}
+	
+	\item \textbf{correctness:}\\
+	the detail description is showed above,$OPT(n)$ can be solved 
+	from state $OPT(1)$,and all conditions are considered,thus it's 
+	a correct algorithm.
+	\item \textbf{complexity:} \\
+	Obviously it costs $O(n)$ time.
+	
+	
+	
+	
+	
+	
+\end{enumerate}

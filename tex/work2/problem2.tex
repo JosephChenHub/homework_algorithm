@@ -1,0 +1,91 @@
+\section{Money robbing}
+\subsection{case 1 }
+\begin{enumerate}[a).]
+\item \textbf{description:}
+\begin{itemize}
+	\item \textbf{Def.}\qquad $OPT(i)$ = sum of optimal subset of a list of non-negative integers.
+	\item \textbf{Given.}\quad a list of non-negative integers $A_n=\left\lbrace a_1,a_2,...,a_n\right\rbrace$.
+	\item \textbf{Goal.} \quad$OPT(n)$.
+\end{itemize}
+To compute $OPT(i)$,
+\begin{itemize}
+	\item if $i =1$, $OPT(i) = a_1$;
+	\item if $i =2$, $OPT(i) = \max(a_1,a_2 )$;
+	\item if $i > 2$, \[OPT(i) = \max \left\lbrace \begin{split} 
+	&OPT(i-1)  \\
+	&OPT(i-2) + a_i
+	\end{split} \right .\]
+\end{itemize}
+
+\item \textbf{pseudo-code:}\\
+\begin{algorithm}[H]
+	\caption{find the optimal subset with maximum sum of a list of positive integers}
+	\begin{algorithmic}[1]
+		\Require \quad A set of positive integers $A_n=\left\lbrace a_1,a_2,...,a_n\right \rbrace $
+		\Ensure maximum sum of subset $S$,any two elements of $S$ are not adjacent in $A_n$
+		\Function {MONEY-ROBBING}{$a_1,a_2,...,a_n$}
+		\If {$n=0$($A_n$ is NULL)}
+			\State \Return $0$
+		\ElsIf {$n\leq 2$}
+			\State \Return $\max(A_n)$
+		\EndIf	
+		\State initialize $sum[n] = \left\lbrace a_1, \max(a_1,a_2), 0,0,...\right\rbrace $
+		\For {$i=3$ to $n$}
+			\State $sum[i] = \max(sum[i-1], sum[i-2] + a_i )$
+		\EndFor 
+		\State \Return $sum[n]$
+		\EndFunction
+	\end{algorithmic}
+\end{algorithm}
+
+\item \textbf{correctness:}
+\begin{itemize}
+	\item if $n = 1,A_n = \left\lbrace a_1\right\rbrace$,then $OPT(n) = a_1$;
+	\item if $n = 2,A_n = \left\lbrace a_1,a_2\right\rbrace$ ,then $OPT(n) = \max(a_1,a_2)$;
+	\item if $n > 2$, let $k=n-1$,$A_k =\left\lbrace a_1,a_2,...,a_k\right\rbrace, OPT(k) = \text{sum}(S_k)$ ,$S_k$ be the
+	optimal subset of $A_k$.
+	$A_{k+1} =\left\lbrace a_1,a_2,...,a_k,a_{k+1}\right\rbrace$, 
+	\begin{enumerate}[i.]
+		\item 	if $a_{k+1} \in S_{k+1}$,then  $a_k \notin S_{k+1}$,
+		$S_{k+1} = S_{k-1}\cup \left\lbrace a_{k+1}\right\rbrace $,
+		thus $OPT(k+1) = OPT(k-1) + a_{k+1}$;
+		\item 	if $a_{k+1} \notin S_{k+1}$, $S_{k+1} = S_{k}$,hence $OPT(k+1) = OPT(k)$.
+	\end{enumerate}
+	in summary, if $n > 2$
+	\[
+		OPT(n) = \max \left\lbrace \begin{split} 
+		&OPT(n-1) \\
+		&OPT(n-2) + a_{n}
+		\end{split} \right .
+	\]	
+\end{itemize}
+	$OPT(n)$ can be solved recursively from $OPT(1)$,the algorithm is correct .
+
+\item \textbf{complexity:}\\	
+	Obviously it costs $O(n)$ time.
+	
+	
+\end{enumerate}
+
+\subsection{case 2 -- all houses are arranged in a circle}
+Under this circumstance, let $S'_k$ be the optimal subset of $A'_k = \left\lbrace a_1,a_2,...,a_k\right\rbrace$
+($a_1,a_k$ are adjacent),
+$OPT'(k)$ be the sum of $S'_k$,$OPT(k)$ be the sum in the condition above.
+\begin{itemize}
+	\item if $a_1 \in S'_k$,then $a_k \notin S'_k$, $OPT'(k) = OPT(k-1)$;
+	\item if $a_1 \notin S'_k$, then $a_k$ may belong to $S'_k$,just let $a_1 = 0$,
+		 thus $OPT'(k) = OPT(k)$
+\end{itemize}
+hence,
+\[
+	OPT'(n) = \left\lbrace \begin{split} 
+	&\max(A'_k),&\text{if } n <=3 \\
+	 &\max \left\lbrace
+	 \begin{split} 
+	&OPT(n-1) &\\
+	&OPT(n),\text{let } a_1 = 0
+	\end{split} \right. &otherwise
+	\end{split}\right.
+\]
+
+

@@ -1,0 +1,94 @@
+\section{Largest Divisible Subset}
+\begin{enumerate}[a).]
+\item
+\begin{itemize}
+	\item \textbf{Def.}\qquad$OPT(i)$ = length of the optimal subset  of distinct integers $a_1,a_2,...,a_i$.
+	\item \textbf{Given.}\quad a set of distinct positive integers $A_n = \left \lbrace a_1,a_2,...,a_n\right \rbrace$.
+	\item \textbf{Goal.} \quad$OPT(n)$ and extract optimal subset $S$.
+\end{itemize} 
+To compute $OPT(i)$,
+\begin{itemize}
+	\item if $i = 1$, $A_i = \left\lbrace a_1\right \rbrace $,$OPT(1) = 1$;
+	\item for $i > 1$, firstly we sort the original array in ascending order,
+		then scan over the array from $j = 1$ to $j = i-1$,hence
+		\begin{equation*}
+		  OPT(i) = \max \left\lbrace \begin{split} 
+		  &OPT(j) + 1,\quad a_i\%a_{j} = 0 \text{ and }\forall m, j<m<i, a_i\%a_{m} \neq 0	\\
+		  &OPT(i-1) 
+		  \label{form1}
+		  \end{split} \right . 
+		\end{equation*}
+\end{itemize}
+\item \textbf{pseudo-code:}
+\begin{algorithm}[H]
+	\caption{find the largest divisible subset of distinct positive integers}
+	\begin{algorithmic}[1]
+		\Require A set of distinct positive integers $a_1,a_2,...,a_n$
+		\Ensure the largest divisible subset $S$ 
+		\Function{LARGEST-DIVISIBLE}{$a_1,a_2,...,a_n$}	
+		\If {$n = 1$}  \Return $a_1$
+		\EndIf
+		\State sort original array in ascending order
+	    \State initialize elements of $len[n] ,pre[n]$ with $1$ ,$S=\left\lbrace \right\rbrace $
+	    \For {$i=2$ to $n$}
+			\For {$j=1$ to $i-1$} 
+			 \If {$a[i]\%a[j] =0$ and $len[i] < len[j]+1$}
+				 \State $len[i] = len[j] + 1, pre[i] = j$
+			 	\EndIf 
+			\EndFor  
+		\EndFor 
+		\State $[{max\_len},{max\_index}] = \text{max}(len[])$
+		\State initialize $index[max\_len] = \left\lbrace 0,0,...,0,max\_index\right\rbrace $
+		\For{$i={max\_len}-1$ to $0$}
+			\State $index[i] = pre[max\_index], max\_index = index[i]$
+		\EndFor 
+		\State $S = S\cup a_{index[k]}, k = 1$ to $max\_len$
+		\State \Return $S$
+		\EndFunction 
+	\end{algorithmic}	
+\end{algorithm} 
+\item \textbf{correctness:} \\
+Let $S_i$ be the optimal subset of $A_i = \left\lbrace a_1,a_2,...,a_i\right\rbrace $.
+	\begin{itemize}
+		\item if $i=1,A_i=\left\lbrace a_1\right\rbrace $, then $OPT(i) = 1$,$S_i=\left\lbrace a_1\right\rbrace $	
+		\item if $i=k > 1,A_k=\left\lbrace a_1,a_2,...,a_k\right\rbrace $ is arranged in ascending order.
+		 \begin{enumerate}[i.]
+		 	\item if $a_k \in S_k$,we initialize $S_k=\left\lbrace a_k \right\rbrace$,
+		 	scan over the array from $j=1$ to 
+		 	$k-1$,if $a_k\%a_j =0$, add $a_j$ to $S_k$, finally we can get the $S_k$.
+		 	Find the maximum $j$ subjected to $a_k\%a_j=0$, then
+		 	remove all $a_m$( $a_k\%a_m \neq 0$($ j < m < k$)),
+		 	$S_k$ should be a subset of $\left\lbrace a_1,a_2,...,a_j \right\rbrace\cup 
+		 	\left\lbrace a_k\right\rbrace $,
+		 	 hence $\text{len}(S_k)
+		 	= OPT(j) + 1$;
+		 	\item if $a_k \notin S_k$,
+		 	that means it does not matter to remove $a_k$,thus $\text{len}(S_k) = \text{len}(S_{k-1})=OPT(k-1)$	
+		 \end{enumerate}
+	   thus 
+	   \[
+		   OPT(i) = \max\left\lbrace \begin{split}
+		   &OPT(j) + 1,\quad a_k\%a_{j} = 0 \text{ and }\forall m, j<m<i, a_i\%a_{m} \neq 0 \\  
+		   &OPT(i-1) 
+		   \end{split}\right. 
+	   \]	
+	\end{itemize} 
+	\quad In the pseudo-code, we use a small trick that only when $len[j]+1 > len[i]$ ,
+	$len[i]$ is updated and the position $j$ is recorded,then find the maximum
+	element of $len[]$.In another words,
+	$len[i]$ is the length of the subset $S'_i$ ended with $a_i$,
+	 $pre[i]$ is the end position of  subset $S'_i-\left\lbrace{a_i} \right\rbrace$ ($ a_i\%a_{pre[i]}=0$ and
+	 $\forall k,pre[i]<k<i, a_i\%a_k \neq 0$).
+	There must exists a subset ended with $\max(S_i)$,if we find
+	$i_0$ that $len[i_0]$ is the maximum in $len[]$,the subset $S'_{i_0}$ is the
+	optimal subset $S_i$.
+	
+\item \textbf{complexity:}
+\begin{itemize}
+	\item sorting the array costs  $O(nlogn)$ using quick-sort;
+	\item traversal needs $\frac{n(n-1)}{2}$ steps,thus it costs $O(n^2)$;
+	\item tracing back to extract optimal subset costs $O(n)$
+\end{itemize}
+thus the time complexity of algorithm is $O(n^2)$.
+
+\end{enumerate} 
