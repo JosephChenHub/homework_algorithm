@@ -15,38 +15,49 @@ using namespace std;
 struct node{
 	char data;
 	size_t weight;
-	struct node * left;
-	struct node * right;
+	struct shared_ptr<node> left;
+	struct shared_ptr<node>  right;
 };
-//! tree
-class tree{
+
+
+//! huff_tree
+class huff_tree{
 public:
-	tree()
+	huff_tree()
 	{
-		root = NULL;
-		index_root = 0;
 	}
-	tree(USE_TYPE ch, size_t w)
+	huff_tree(USE_TYPE ch, size_t w)
 	{
 		create(ch,w);
 	}
-	~tree()
+	~huff_tree()
 	{
-		std::cout<<"destroy obj:"<<this<<" root:"<<root<<std::endl;
+//		std::cout<<"destroy obj:"<<this<<" root:"<<root<<std::endl;
 		destroy(root);
 	}
-	
+/*
+	huff_tree & operator=(huff_tree &other)
+	{
+		if(this != &other)
+		{
+			destroy(root);
+			root = make_shared<node>();
+			root = other.root;
+		}
+		return *this;
+	}
+*/	
 	void create(USE_TYPE ch, size_t w)
 	{
 		destroy(root);
-		root = new node;
+		root = make_shared<node>();
 		root->left = NULL;
 		root->right = NULL;
 		root->data = ch;
 		root->weight = w;  
 	}
 	//! free memory 
-	void destroy(node *s)
+	void destroy(shared_ptr<node> &s)
 	{
 		if(s == NULL)
 		{
@@ -57,15 +68,15 @@ public:
 		destroy(s->right);
 		s->right = NULL;
 		
-		delete s;	
+		s.reset();
 		s = NULL;
 	}
 	//!depth of node
-	int depth(node *s)
+	int depth(shared_ptr<node> & s)
 	{
-		return depth(s, root, 0);
+	   depth(s,root,0);
 	}
-	int depth(node *s, node *r, int d = 0) 
+	int depth(shared_ptr<node> & s, shared_ptr<node> &r, int d = 0) 
 	{
 		if(r == NULL)
 		{
@@ -94,7 +105,7 @@ public:
 		
 		return (temp1 > temp2? temp1:temp2);
 	}
-	//!height of the tree
+	//!height of the huff_tree
 	int height() 
 	{
 		return  height(root);
@@ -108,6 +119,7 @@ public:
 private:
 
 };
+
 
 //!Huffman encoding and decoding
 class Huffman{
@@ -155,8 +167,8 @@ public:
 	{
 
 	}
-	//!merge two tree,b is out
-	void merge_tree(tree &a , tree &b)
+	//!merge two huff_tree,b is out
+	void merge_huff_tree(huff_tree &a , huff_tree &b)
 	{
 		if(a.root == NULL)
 		{
@@ -164,11 +176,13 @@ public:
 		}
 		else if(b.root == NULL)
 		{
-			b.root = new node;
+			b.root = make_shared<node>();
 			b.root = a.root;
 			return;
 		}
-        node *new_root = new node;
+        shared_ptr<node> new_root = make_shared<node>();
+		new_root->left = make_shared<node>();
+		new_root->right = make_shared<node>();
 
 		new_root->left = a.root;
 		new_root->right = b.root;
@@ -177,7 +191,8 @@ public:
 
 		b.root = new_root;
 	}
-	int create_tree(size_t *cnt, int len, tree & out)
+	
+	int create_huff_tree(size_t *cnt, int len, huff_tree & out)
 	{
 		
 		for(int i = 0; i < len && len <= CODE_WIDTH ; ++i)
@@ -190,17 +205,26 @@ public:
 		}
 		//!sort by value
 //		sort_map(weights);	
-		std::vector<tree> m;
+		std::vector<huff_tree> m;
+		m.resize(weights.size());
+		int i = 0;
 		for(std::map<USE_TYPE,size_t>::iterator it = weights.begin(); it != weights.end(); ++it)
 		{
 			
-//			m.push_back(tree(it->first, it->second));
+			m[i++].create(it->first, it->second);
 		} 		
 
-//		std::sort(m.begin(), m.end(), comp_tree_weight);
-		tree m_out; //
-
-
+		std::sort(m.begin(), m.end(),comp_huff_tree); //!descending order
+		size_t l = m.size();
+		while(l >= 2)
+		{
+			merge_huff_tree(m[l-1], m[l-2]);
+			//m.pop_back(); //remove the minimum
+			std::sort(m.begin(), m.begin() + l, comp_huff_tree); //sort
+			l --; 
+		}
+		out = m[0];
+		int j = 0;
 
 	}
 	void sort_map(std::map<USE_TYPE,size_t> & w)
@@ -221,13 +245,14 @@ private:
 	const int CODE_WIDTH = 128;
 	std::map<USE_TYPE, size_t> weights;
 	std::vector<std::pair<USE_TYPE,size_t> > vec_weights;
-	static bool comp_by_val(const std::pair<USE_TYPE,size_t> & l , const std::pair<USE_TYPE,size_t>& r)
+
+	inline static bool comp_by_val(const std::pair<USE_TYPE,size_t> & l , const std::pair<USE_TYPE,size_t>& r)
 	{
 		return l.second < r.second;
 	}		
-	static bool comp_tree_weight(const tree & l,const tree &r)
+	inline static bool comp_huff_tree(const huff_tree  &l,const huff_tree &r)
 	{
-		return l.root->weight < r.root->weight;
+		return l.root->weight > r.root->weight;
 	}
 
 };
