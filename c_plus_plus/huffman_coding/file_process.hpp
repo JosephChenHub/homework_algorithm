@@ -6,17 +6,20 @@
 #include <algorithm> //use sort
 #include <map>  //use map
 #include <vector>
-#include <memory> 
+#include <memory>
+#include <iomanip>
 
-#define  USE_TYPE char
-using namespace std;
+#define DEBUG_ON 0 //print some info.
+typedef char USE_TYPE;
+const int CODE_WIDTH = 128;
+
 
 //! node with weight
 struct node{
-	char data;
+	USE_TYPE data;
 	size_t weight;
-	struct shared_ptr<node> left;
-	struct shared_ptr<node>  right;
+	struct node * left;
+	struct node * right;
 };
 
 
@@ -25,6 +28,8 @@ class huff_tree{
 public:
 	huff_tree()
 	{
+		_height = 0;
+		root = NULL;
 	}
 	huff_tree(USE_TYPE ch, size_t w)
 	{
@@ -32,91 +37,130 @@ public:
 	}
 	~huff_tree()
 	{
-//		std::cout<<"destroy obj:"<<this<<" root:"<<root<<std::endl;
-		destroy(root);
+#if DEBUG_ON
+		std::cout<<"destroy add:"<<this<<" root_addr:"<<root<<std::endl;
+#endif
+		destroy_tree();
 	}
-/*
-	huff_tree & operator=(huff_tree &other)
-	{
-		if(this != &other)
-		{
-			destroy(root);
-			root = make_shared<node>();
-			root = other.root;
-		}
-		return *this;
-	}
-*/	
 	void create(USE_TYPE ch, size_t w)
 	{
-		destroy(root);
-		root = make_shared<node>();
+		destroy_tree(root);
+		root = new node;
 		root->left = NULL;
 		root->right = NULL;
 		root->data = ch;
-		root->weight = w;  
+		root->weight = w; 
+		_height = 1; 
 	}
-	//! free memory 
-	void destroy(shared_ptr<node> &s)
+	//!height of the huff_tree
+	int height() const 
+	{
+		return  _height;
+	}
+	void merge_tree(huff_tree &src)
+	{
+		merge_tree(src.root, root);
+		update_height();
+	}
+	int root_weight()const
+	{
+		return root->weight;
+	}
+	void destroy_tree()
+	{
+		destroy_tree(root);
+	}
+	//! print the tree to screen
+	void postorder(node* p, int indent=0)
+	{
+    	if(p != NULL) 
+		{
+        	if(p->right)
+			 {
+            	postorder(p->right, indent+4);
+       		 }
+        	if (indent) 
+			{
+            	std::cout << std::setw(indent) << ' ';
+        	}
+        	if (p->right) std::cout<<" /\n" << std::setw(indent) << ' ';
+        	std::cout<< p->data<<","<<p->weight << "\n ";
+        	if(p->left) 
+			{
+            	std::cout << std::setw(indent) << ' ' <<" \\\n";
+            	postorder(p->left, indent+4);
+        	}
+    	}
+	}
+	//! search data
+
+public:
+	node *  root;
+private:
+	int _height;
+	//! destroy a tree of root s	
+	void destroy_tree(node * s)
 	{
 		if(s == NULL)
 		{
 			return;
 		}
-		destroy(s->left);
-		s->left = NULL;	
-		destroy(s->right);
-		s->right = NULL;
+		destroy_tree(s->left);
+		destroy_tree(s->right);
 		
-		s.reset();
+		delete s;
 		s = NULL;
 	}
-	//!depth of node
-	int depth(shared_ptr<node> & s)
-	{
-	   depth(s,root,0);
-	}
-	int depth(shared_ptr<node> & s, shared_ptr<node> &r, int d = 0) 
-	{
-		if(r == NULL)
-		{
-			return 0;
-		}			
-		if(r == s)
-		{
-			return d;
-		}		
-		int temp1 = depth(s, r->left, d+1);
- 
-		int temp2 = depth(s, r->right,d+1);		
-			
-		return temp1>temp2?temp1:temp2;
-	}
 	//!height of a node
-	int height(shared_ptr<node> &s)
+	int height(node * s)
 	{
 		if(s == NULL)
 		{
 			return 0;
 		}	
-			
 		int temp1 = height(s->left) + 1;
 		int temp2 = height(s->right) + 1;
 		
 		return (temp1 > temp2? temp1:temp2);
 	}
-	//!height of the huff_tree
-	int height() 
+	void update_height()
 	{
-		return  height(root);
+		_height = height(root);
 	}
-	size_t root_weight() const
+	void merge_tree(node * &src, node * &dst)
 	{
-		return root->weight;
+		if(src == NULL)
+		{
+			return ;
+		}
+		else if(dst == NULL) //copy from src
+		{
+			dst = new node;
+			dst->data = src->data;
+			dst->weight = src->weight;
+			dst->left = NULL;
+			dst->right = NULL;
+
+			merge_tree(src->left,dst->left);
+			merge_tree(src->right, dst->right);	
+			
+			return;
+		}
+		node * new_root = new node;
+		new_root->data = 0;
+		new_root->weight = src->weight + dst->weight;
+		new_root->left = NULL;
+		new_root->right = NULL;
+		merge_tree(src, new_root->left);
+		merge_tree(dst, new_root->right);
+		
+		destroy_tree(dst);
+
+		dst = new node;
+		dst = new_root;
 	}
-public:
-	shared_ptr<node>  root;//!prevent deleting twice
-private:
+
+
 
 };
 
@@ -131,7 +175,7 @@ public:
 	~Huffman()
 	{
 		delete count;
-
+		count = NULL;
 	}
 	void compress(std::string &file_name)
 	{
@@ -143,7 +187,7 @@ public:
 
 
 	}
-	int createTable(std::string &file_name)
+	int create_huff_table(std::string &file_name, huff_tree &out)
 	{
 		std::ifstream file;
 		file.open(file_name, std::ios::in);
@@ -152,7 +196,7 @@ public:
 			std::cout<<"open file failed: "<<file_name<<"!"<<std::endl;			
 			return -1;
 		}
-		char ch;
+		USE_TYPE ch;
 		while(! file.eof())
 		{
 			file>>ch;
@@ -161,98 +205,75 @@ public:
 		}
 		file.close();
 		//!
-		
+		create_huff_tree(count, CODE_WIDTH, out);
+				
 	}
-	void readTable(std::string &file_name)
+	void read_huff_table(std::string &file_name)
 	{
 
 	}
-	//!merge two huff_tree,b is out
-	void merge_huff_tree(huff_tree &a , huff_tree &b)
+	//!merge two huff_tree,b is the result
+	void merge_huff_tree(huff_tree & a, huff_tree &b)
 	{
-		if(a.root == NULL)
-		{
-			return ;
-		}
-		else if(b.root == NULL)
-		{
-			b.root = make_shared<node>();
-			b.root = a.root;
-			return;
-		}
-        shared_ptr<node> new_root = make_shared<node>();
-		new_root->left = make_shared<node>();
-		new_root->right = make_shared<node>();
-
-		new_root->left = a.root;
-		new_root->right = b.root;
-		new_root->data = 0;
-		new_root->weight = a.root_weight() + b.root_weight();
-
-		b.root = new_root;
+		b.merge_tree(a);	
 	}
 	
-	int create_huff_tree(size_t *cnt, int len, huff_tree & out)
+	void create_huff_tree(size_t *cnt, int len, huff_tree & out)
 	{
-		
 		for(int i = 0; i < len && len <= CODE_WIDTH ; ++i)
 		{
-			if(cnt[i] != 0) //cnt[i] is the weight, i the char
+			if(cnt[i] != 0) //cnt[i] is the weight, i the USE_TYPE
 			{
-				weights[USE_TYPE(i)] = cnt[i]; //key--char, val--weight
+				weights[USE_TYPE(i)] = cnt[i]; //key--USE_TYPE, val--weight
 			}
-
 		}
-		//!sort by value
-//		sort_map(weights);	
-		std::vector<huff_tree> m;
-		m.resize(weights.size());
+		std::vector<std::unique_ptr<huff_tree> > trees; //using unique_ptr, for std::sort
+		for(int i = 0; i < weights.size(); ++i)
+		{
+			trees.emplace_back(new huff_tree);
+		}
 		int i = 0;
 		for(std::map<USE_TYPE,size_t>::iterator it = weights.begin(); it != weights.end(); ++it)
 		{
 			
-			m[i++].create(it->first, it->second);
+			trees[i++]->create(it->first, it->second);
 		} 		
-
-		std::sort(m.begin(), m.end(),comp_huff_tree); //!descending order
-		size_t l = m.size();
-		while(l >= 2)
-		{
-			merge_huff_tree(m[l-1], m[l-2]);
-			//m.pop_back(); //remove the minimum
-			std::sort(m.begin(), m.begin() + l, comp_huff_tree); //sort
-			l --; 
-		}
-		out = m[0];
-		int j = 0;
-
-	}
-	void sort_map(std::map<USE_TYPE,size_t> & w)
-	{
-		vec_weights.clear();
-		vec_weights.resize(w.size());
-		int i = 0;
-		for(std::map<USE_TYPE,size_t>::iterator it = w.begin(); it != w.end(); ++it)
-		{
-			vec_weights[i++] = std::make_pair(it->first, it->second);
-		}
-
-		std::sort(vec_weights.begin(), vec_weights.end(),comp_by_val);		
 		
+#if DEBUG_ON
+		for(int i = 0; i < trees.size(); ++i)
+		{
+			std::cout<<"tree: trees["<<i<<"] root_addr:"<<trees[i]->root<<" data:"<< trees[i]->root->data<<" weight:"<<trees[i]->root->weight<<std::endl;
+		}
+		std::cout<<"after sort"<<std::endl;
+#endif 
+		std::sort(trees.begin(), trees.end(), comp_huff_tree); //!descending order
+#if DEBUG_ON
+		for(int i = 0; i < trees.size(); ++i)
+		{
+			std::cout<<"tree: trees["<<i<<"] root_addr:"<<trees[i]->root<<" data:"<< trees[i]->root->data<<" weight:"<<trees[i]->root->weight<<std::endl;
+
+		}
+#endif
+		while(trees.size() >= 2)
+		{
+			merge_huff_tree(*trees[trees.size()-1], *trees[trees.size()-2]);
+			trees.pop_back();
+			std::sort(trees.begin(), trees.end(), comp_huff_tree); //sort
+		}
+		out.destroy_tree();
+		merge_huff_tree(*trees[0], out);
 	}
 private:
 	size_t *count;
-	const int CODE_WIDTH = 128;
 	std::map<USE_TYPE, size_t> weights;
-	std::vector<std::pair<USE_TYPE,size_t> > vec_weights;
 
-	inline static bool comp_by_val(const std::pair<USE_TYPE,size_t> & l , const std::pair<USE_TYPE,size_t>& r)
+	inline static bool comp_huff_tree(const std::unique_ptr<huff_tree>  &l, const std::unique_ptr<huff_tree> &r) 
 	{
-		return l.second < r.second;
-	}		
-	inline static bool comp_huff_tree(const huff_tree  &l,const huff_tree &r)
-	{
-		return l.root->weight > r.root->weight;
+		if(l->root->weight == r->root->weight)
+		{
+			return l->height() > r->height();
+		}
+		return l->root->weight > r->root->weight;
 	}
 
 };

@@ -22,12 +22,13 @@ int main(int argc, char * argv[])
 	cnt['p'] = 1;
 	cnt['r'] = 1;
 
-	
-	
+
 
 	huff_tree out;
 	huff_coding.create_huff_tree(cnt,len, out);
 
+//	huff_coding.create_huff_table(file_name,out);
+	out.postorder(out.root,0); //show the tree
 
 
 
