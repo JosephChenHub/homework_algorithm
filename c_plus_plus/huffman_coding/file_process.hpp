@@ -42,6 +42,7 @@ public:
 #endif
 		destroy_tree();
 	}
+	//! create a tree with one node
 	void create(USE_TYPE ch, size_t w)
 	{
 		destroy_tree(root);
@@ -57,6 +58,7 @@ public:
 	{
 		return  _height;
 	}
+	//!merge trees
 	void merge_tree(huff_tree &src)
 	{
 		merge_tree(src.root, root);
@@ -66,6 +68,7 @@ public:
 	{
 		return root->weight;
 	}
+	//!destroy this tree
 	void destroy_tree()
 	{
 		destroy_tree(root);
@@ -92,10 +95,53 @@ public:
         	}
     	}
 	}
-	//! search data
+	//!depth
+	int depth(char data) 
+	{
+		return depth(data, root);
+	}
+	int depth(node *p)
+	{
+		return depth(p,root);
+	}
+	//! create map
+	void create_map(char data, std::vector<bool> &bits)
+	{
+		int d = depth(data);
+		bits.resize(d);
+		create_map(data, root, bits);
 
+	}
+	void create_map(char data,node *s, std::vector<bool> &bits)
+	{
+		if(s == NULL)
+		{
+			return ;
+		}
+		int d = depth(s);
+		if(s->left) //not NULL
+		{
+			bits[d] = 0; //!left edge = 0
+			if(s->left->data == data)
+			{
+					return ;
+			}
+			create_map(data,s->left,  bits);
+		}
+		if(s->right)
+		{
+			bits[d] = 1;
+			if(s->right->data == data)
+			{
+				return;
+			}
+			create_map(data,s->right,bits);
+		}
+		
+	}
 public:
 	node *  root;
+
 private:
 	int _height;
 	//! destroy a tree of root s	
@@ -123,10 +169,58 @@ private:
 		
 		return (temp1 > temp2? temp1:temp2);
 	}
+	//! depth of node 
+	int depth(char data, node *s, int d = 0)
+	{
+		if(s == NULL)
+		{
+			return -1;
+		}
+		if(s->data == data )//&& s->left == NULL && s->right == NULL) //!no child
+		{
+			return d;
+		}
+		int temp1 = depth(data, s->left, d+1);
+		int temp2 = depth(data, s->right, d+1);
+		return temp1>temp2?temp1:temp2;
+	}
+	int depth(node *p, node *s, int d = 0)
+	{
+		if(s == NULL || p == NULL)
+		{
+			return -1;
+		}
+		if(s == p)
+		{
+			return d;
+		}
+		int temp1 = depth(p, s->left, d+1);
+		int temp2 = depth(p, s->right, d+1);
+		return temp1>temp2?temp1:temp2;
+	}
+	//!if p exists, return 0;else -1
+	int search(char data,node *&p , node *&s)
+	{
+		if(s == NULL)
+		{
+			return -1;
+		}
+		if(s->data == data)
+		{
+			p = s;
+			return 0;
+		}
+		int temp1 = search(data,p, s->left);
+		int temp2 = search(data,p, s->right);
+
+		return temp1>temp2?temp1:temp2;	
+	}
+	//!update height of tree
 	void update_height()
 	{
 		_height = height(root);
 	}
+	//!merge
 	void merge_tree(node * &src, node * &dst)
 	{
 		if(src == NULL)

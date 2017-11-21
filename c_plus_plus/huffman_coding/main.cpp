@@ -30,10 +30,16 @@ int main(int argc, char * argv[])
 //	huff_coding.create_huff_table(file_name,out);
 	out.postorder(out.root,0); //show the tree
 
-
-
-
-		
+	vector<bool> bits;
+	
+	char a = 'e';
+	out.create_map(a,bits);
+	cout<<"bits of "<<a<<" :";
+	for(int i = 0; i < bits.size(); ++i)
+	{
+		cout<<bits[i]<<" ";
+	}		
+	cout<<endl;
 
 	return 0;
 }
