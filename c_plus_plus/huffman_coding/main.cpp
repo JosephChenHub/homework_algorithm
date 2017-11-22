@@ -1,3 +1,8 @@
+/*==================================
+compile command:
+	g++ main.cpp -o out -std=c++11
+c++11 is required!
+==================================*/
 #include <iostream>
 
 #include "file_process.hpp"
@@ -9,37 +14,20 @@ int main(int argc, char * argv[])
 
 	Huffman huff_coding;
 
-	string file_name = "../../graph.txt";
+	string input1  = "graph.txt";
+	string output1 = "compress_graph.bin";
+	string recover1 = "recover_graph.txt";
+	string input2  = "Aesop_Fables.txt";
+	string output2 = "compress_Aesop_Fables.bin";
+	string recover2 = "recover_Aesop_Fables.txt";
 
-	int len = 128;
-	size_t *cnt = new size_t[len];
-	cnt['g'] = 3;
-	cnt['o'] = 3;
-	cnt[' '] = 2;
-	cnt['e'] = 1;
-	cnt['s'] = 1;
-	cnt['h'] = 1;
-	cnt['p'] = 1;
-	cnt['r'] = 1;
+	huff_coding.compress(input1, output1);
+	huff_coding.compress(input2, output2);
+
+	huff_coding.decompress(output1, recover1);
+	huff_coding.decompress(output2, recover2);
 
 
-
-	huff_tree out;
-	huff_coding.create_huff_tree(cnt,len, out);
-
-//	huff_coding.create_huff_table(file_name,out);
-	out.postorder(out.root,0); //show the tree
-
-	vector<bool> bits;
-	
-	char a = 'e';
-	out.create_map(a,bits);
-	cout<<"bits of "<<a<<" :";
-	for(int i = 0; i < bits.size(); ++i)
-	{
-		cout<<bits[i]<<" ";
-	}		
-	cout<<endl;
 
 	return 0;
 }
