@@ -16,17 +16,8 @@ s.t. A*x <= b
 ==========================================
 
 '''
-DEBUG = False #True
-
+DEBUG = False  #True
 inf = 99999999.0
-c = np.array([-7,7,-2,-1,-6,0])
-Aeq = np.array([
-	 [-3,1,-1,2,0,0],
-	 [2, 1,0, 1,1,0],
-	 [-1,3,0,-3,0,1]])
-beq = np.array([3,4,12])
-
-len_var = len(c)
 
 def transform(M, index_row, index_col):
 	rows,cols = M.shape
@@ -36,34 +27,53 @@ def transform(M, index_row, index_col):
 		else:
 			M[i] = M[i]/M[index_row][index_col]
 
-def select_row(M, index_col, bounds ):
+def select_row(M, index_col, bounds, priority_index = []):
 	global inf
-	min_val = inf
-	index_row = 0
+	min_val = [inf,inf]
+	index_row = [0,0]
 	rows,cols = M.shape
+	#priority first
+	for j in priority_index: 
+		if abs(M[j][index_col]) > 1e-6: #not zero
+			temp = M[j][cols-1]/M[j][index_col]
+			if min_val[0] > temp and temp > -1e-6: # >=0
+				if abs(temp) < 1e-6:
+					if M[j][index_col] < 0: #if RHS=0, M[j][index_col] must be positive
+						continue
 
+				min_val[0] = temp
+				index_row[0] = j
+	
 	for j in bounds:
 		if abs(M[j][index_col]) > 1e-6 :
-			if min_val > M[j][cols-1]/M[j][index_col] and M[j][cols-1]/M[j][index_col] >= 0:
-				min_val = M[j][cols-1]/M[j][index_col]
-				index_row = j	
-	
+			temp = M[j][cols-1]/M[j][index_col]
+			if min_val[1] > temp and temp > -1e-6:
+				if abs(temp) < 1e-6:
+					if M[j][index_col] < 0:
+						continue
+
+				min_val[1] = temp
+				index_row[1] = j
 	
 	out = []
-	if min_val == inf:
+	if abs(min_val[0] - inf) < 1e-6  and abs(min_val[1] - inf) < 1e-6: #min ratio test failed
 		status = False
+		out.append(status)
+		out.append(-1)
 	else:
 		status = True
-	out.append(status)
-	out.append(index_row)
+		out.append(status)
+		if min_val[0] - min_val[1] < 1e-6: 
+			out.append(index_row[0])
+		else:
+			out.append(index_row[1])
 
 	return out
 
 def update_var(M,x_var,lside):
-	star_index = []
 	rows, cols = M.shape
 	for i in range(rows-1):
-		if abs(M[i][lside[i]]  ) > 1e-6: 
+		if abs(M[i][lside[i]] ) > 1e-6:  
 			x_var[lside[i] ] = M[i][cols-1]/M[i][lside[i] ]
 	
 
@@ -126,7 +136,8 @@ def simplex(c, A = [], b = [], Aeq = [], beq = [], prob = 'Maximize'):
 	
 	M = np.concatenate((left, middle, right), axis = 1)
 	cols = M.shape[1]
-	for i in range(rows-1): #make sure RHS >=0
+	#RHS >= 0
+	for i in range(rows):
 		if M[i][cols-1] < 0:
 			M[i] = -M[i]
 
@@ -144,22 +155,13 @@ def simplex(c, A = [], b = [], Aeq = [], beq = [], prob = 'Maximize'):
 		print 'initialize lside:',lside
 		print 'initialize star_index:', star_index
 	print 'primary problem has {} equalities and {} inequalities'.format(len_beq, len_b)
-	print 'construct tabular:'
-	pprint(M)
+#	print 'construct tabular:'
+#	pprint(M)
 	print 'starting optimization...'
 	#solving 
 
 
 	for times in range(max_iters):	
-		#check whether to stop
-		#all coefficients of the bottom row must >= 0 
-		cnt = 0
-		for i in range(cols-2):
-			if M[rows-1][i] >= 0:
-				cnt += 1
-		if cnt == cols-2 and len(star_index) == 0 :
-			break
-
 		if len(star_index) > 0:
 			#phase1 , get rid of negative slack variables 
 			if DEBUG == True:
@@ -169,7 +171,8 @@ def simplex(c, A = [], b = [], Aeq = [], beq = [], prob = 'Maximize'):
 			index_col = temp.argmax()
 			#min ratio 
 			bounds = range(0,rows-1)
-			out = select_row(M, index_col, bounds)
+			priority = star_index - len_var
+			out = select_row(M, index_col, bounds, priority) 
 			if out[0] == False:
 				print 'min ratio test failed!'
 				print 'unbounded'
@@ -188,7 +191,7 @@ def simplex(c, A = [], b = [], Aeq = [], beq = [], prob = 'Maximize'):
 				print 'lside',lside	
 			update_var(M, x_var, lside)
 			s_var = x_var[len_var:cols-2]
-			star_index = np.where(s_var < 0)[0] + len_var
+			star_index = np.where(s_var < -1e-6)[0] + len_var
 			if DEBUG == True:
 				print 'update x_var:', x_var
 				print star_index	
@@ -196,6 +199,15 @@ def simplex(c, A = [], b = [], Aeq = [], beq = [], prob = 'Maximize'):
 				print 'M:'
 				pprint(M)
 		else: #phase2 
+			#check whether to stop
+			#all coefficients of the bottom row must >= 0 
+			cnt = 0
+			for i in range(cols-2):
+				if M[rows-1][i] >= -1e-6: #>=0
+					cnt += 1
+			if cnt == cols-2:
+				break
+
 			if DEBUG == True:
 				print 'phase2:standard solving...'
 			bottom = -M[rows-1][:cols-2]
@@ -221,7 +233,7 @@ def simplex(c, A = [], b = [], Aeq = [], beq = [], prob = 'Maximize'):
 				print 'lside',lside	
 			update_var(M, x_var, lside)
 			s_var = x_var[len_var:cols-2]
-			star_index = np.where(s_var < 0)[0] + len_var
+			star_index = np.where(s_var < -1e-6)[0] + len_var
 			if DEBUG == True:
 				print 'update x_var:', x_var
 				print star_index	
@@ -240,13 +252,20 @@ def simplex(c, A = [], b = [], Aeq = [], beq = [], prob = 'Maximize'):
 	return result
 
 
+c = np.array([-7,7,-2,-1,-6,0])
+Aeq = np.array([
+	 [3,-1,1,-2,0,0],
+	 [2, 1,0, 1,1,0],
+	 [-1,3,0,-3,0,1]])
+beq = np.array([-3,4,12])
+
+len_var = len(c)
 
 result = simplex(c,Aeq = Aeq,beq = beq,prob = 'Minimize')
 
 if result[0] == True:
 	print 'optimal value:', result[1]
 	print 'optimal x:', result[2]
-
 
 #using tool --cvxpy
 #construct the problem
