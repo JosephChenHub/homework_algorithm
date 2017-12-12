@@ -1,0 +1,53 @@
+\documentclass[12pt,a4paper]{article}
+\usepackage[utf8]{inputenc}
+\usepackage{amsmath}
+\usepackage{amsfonts}
+\usepackage{amssymb}
+\usepackage{graphicx}
+\usepackage[left=1.00in, right=1.00in, top=1.00in, bottom=1.00in]{geometry}
+\usepackage{fontspec}
+\setmainfont{Times New Roman}
+
+\usepackage{enumerate}
+\usepackage{booktabs}
+\usepackage{fontspec}
+\usepackage{bm}
+%minted --insert code
+\usepackage{minted}
+\usepackage{xcolor}
+\definecolor{background-color}{HTML}{f3f3f3} %background-color
+\newcommand{\inputmintedfile}[2]{
+	\inputminted[linenos=true,
+	bgcolor=background-color,
+	fontsize= \footnotesize,
+	fontfamily=courier ,
+	breaklines=true
+	]{#1}
+	{#2}
+}
+%algorithm redefine
+\usepackage{algorithm}
+\usepackage{algorithmicx}
+\usepackage{algpseudocode}
+\renewcommand{\algorithmicrequire}{\textbf{Input:}}
+\renewcommand{\algorithmicensure}{\textbf{Output:}}
+\renewcommand{\thesection}{\arabic{section}.} 
+\renewcommand{\thesubsection}{\roman{subsection}.}
+
+
+\author{Zuyao Chen  201728008629002\\
+	zychen.uestc@gmail.com}
+\title{Assignment 4 of Algorithm}
+\date{} 
+
+
+
+\begin{document}
+	\maketitle
+\input{work4/problem1}
+\input{work4/problem2}	
+\input{work4/problem3}
+ 
+	
+	
+\end{document}

@@ -1,0 +1,21 @@
+\section{Linear-inequality feasibility}
+ \textbf{Proof}:\\
+ \indent suppose that we have an algorithm for linear programming, that means we can solve
+ \[ \begin{split} 
+	 \max \quad &\bm{c}^T\bm{x} \\
+	 \text{s.t.}\quad & \bm{Ax} \leq \bm{b} \\
+	 & \bm{x} \geq \bm{0}
+	\end{split} 
+ \]
+given a linear inequality feasibility problem , our goal is to check whether there exist  $\bm{x}^*$, 
+\[
+	\bm{A}' \bm{x}^* \leq \bm{b}', \bm{x}^* \geq \bm{0}
+\]
+which equals to 
+\[ \begin{split} 
+	\max \quad & \bm{0}\cdot \bm{x} \\
+	\text{s.t.}\quad & \bm{A}'\bm{x} \leq \bm{b}' \\
+	& \bm{x} \geq \bm{0}
+   \end{split}		
+\]
+this problem can be solved using the same algorithm.

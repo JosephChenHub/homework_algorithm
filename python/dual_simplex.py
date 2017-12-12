@@ -4,7 +4,6 @@
 import cvxpy as cvx
 import numpy as np
 from pprint import pprint 
-import scs
 '''
 ==========================================
 dual simplex method , compared with cvxpy
@@ -143,7 +142,7 @@ def simplex(c, A = [], b = [], Aeq = [], beq = [], prob = 'Maximize'):
 
 	M.astype(float)
 	
-	opt_status = True
+	opt_status = False
 	max_iters = 10000
 
 	lside = range(len_var, cols-2)
@@ -176,6 +175,7 @@ def simplex(c, A = [], b = [], Aeq = [], beq = [], prob = 'Maximize'):
 			if out[0] == False:
 				print 'min ratio test failed!'
 				print 'unbounded'
+				opt_status = False
 				break	
 
 			index_row = out[1]
@@ -206,6 +206,7 @@ def simplex(c, A = [], b = [], Aeq = [], beq = [], prob = 'Maximize'):
 				if M[rows-1][i] >= -1e-6: #>=0
 					cnt += 1
 			if cnt == cols-2:
+				opt_status = True
 				break
 
 			if DEBUG == True:
@@ -219,6 +220,7 @@ def simplex(c, A = [], b = [], Aeq = [], beq = [], prob = 'Maximize'):
 				print 'M:', M
 				print 'min ratio test failed!'
 				print 'unbounded!'
+				opt_status = False
 				break
 			
 			index_row = out[1]
@@ -263,6 +265,8 @@ len_var = len(c)
 
 result = simplex(c,Aeq = Aeq,beq = beq,prob = 'Minimize')
 
+
+
 if result[0] == True:
 	print 'optimal value:', result[1]
 	print 'optimal x:', result[2]
@@ -288,9 +292,3 @@ result = prob.solve()
 print 'using tool cvxpy'
 print 'optimal value:', result
 print 'optimal x:',x.value
-
-
-
-
-
-
