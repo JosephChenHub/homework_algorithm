@@ -7,11 +7,15 @@ from pprint import pprint
 '''
 ==========================================
 dual simplex method , compared with cvxpy
-construct dual problem:
-max p = c'*x
-s.t. A*x <= b
-  	  Aeq*x == beq
-	  x >= 0
+primary problem form:
+min p = c'*x
+s.t. A*x == b
+	 x >= 0
+
+the dual problem form:
+max d = -b'y
+s.t.  A'y + c >= 0	
+
 ==========================================
 
 '''
@@ -97,24 +101,27 @@ def simplex(c, A = [], b = [], Aeq = [], beq = [], prob = 'Maximize'):
 		c = -c
 	elif prob == 'Minimize':
 		tar_flag = -1
-
  
 	#construct matrix
 	#should add len(b) + len(beq)*2	slack variables
 	#we put equalities, inequalities, objective
-	len_b = len(b)      
+	len_b = len(b) 
 	len_beq = len(beq)
+	c = c.reshape(-1)
+	len_var = len(c)
 	rows = len_b + len_beq*2 + 1
 	x_var = np.zeros(len_var + len_b + len_beq*2)
 
-	c.shape = (1,c.shape[0])
+	c.shape = (1,len(c))
 	left = c
 	right = np.array([0])
 
 	if len_beq > 0:
+		beq = beq.reshape(-1)
 		left = np.concatenate( (np.tile(Aeq, (2,1)), left ),axis=0)
 		right= np.concatenate( (np.tile(beq, 2), right ), axis = 0)
 	if len_b > 0:
+		b = b.reshape(-1)
 		left = np.concatenate( (A,left), axis=0)
 		right = np.concatenate((b,right), axis=0) 
 
@@ -153,7 +160,7 @@ def simplex(c, A = [], b = [], Aeq = [], beq = [], prob = 'Maximize'):
 		print 'initialize x_var:',x_var
 		print 'initialize lside:',lside
 		print 'initialize star_index:', star_index
-	print 'primary problem has {} equalities and {} inequalities'.format(len_beq, len_b)
+	print  'problem has {} equalities and {} inequalities'.format(len_beq, len_b)
 #	print 'construct tabular:'
 #	pprint(M)
 	print 'starting optimization...'
@@ -166,7 +173,7 @@ def simplex(c, A = [], b = [], Aeq = [], beq = [], prob = 'Maximize'):
 			if DEBUG == True:
 				print 'non-standard form...'		
 			row = star_index[0] - len_var
-			temp = M[row][:len_var] 
+			temp = M[row][:len(x_var)]
 			index_col = temp.argmax()
 			#min ratio 
 			bounds = range(0,rows-1)
@@ -260,28 +267,41 @@ Aeq = np.array([
 	 [2, 1,0, 1,1,0],
 	 [-1,3,0,-3,0,1]])
 beq = np.array([-3,4,12])
+len_c = len(c) 
 
-len_var = len(c)
-
+print 'directly solving...'
 result = simplex(c,Aeq = Aeq,beq = beq,prob = 'Minimize')
-
-
-
 if result[0] == True:
+	print 'status: feasible!'
 	print 'optimal value:', result[1]
 	print 'optimal x:', result[2]
+else:
+	print 'status: infeasible!'
+#dual problem
+d_c = -beq
+d_A = -Aeq.T
+d_b = c
+
+print 'solving dual problem...'
+result2 = simplex(c=d_c, A = d_A, b = d_b, prob = 'Maximize')
+if result2[0] == True:
+	print 'status: feasible!'
+	print 'optimal value:', result2[1]
+	print 'optimal y:', result2[2]
+else:
+	print 'status: infeasible!'
+	
 
 #using tool --cvxpy
 #construct the problem
 
-x = cvx.Variable(len_var)
+x = cvx.Variable(len_c)
 
 obj = c*x
 objective = cvx.Minimize(obj)
 
 constraints = [ 
 	Aeq*x == beq,
-#	A*x <= b,
 	x >= 0
 	]
 #solve
@@ -292,3 +312,4 @@ result = prob.solve()
 print 'using tool cvxpy'
 print 'optimal value:', result
 print 'optimal x:',x.value
+
