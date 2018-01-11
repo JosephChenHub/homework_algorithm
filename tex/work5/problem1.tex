@@ -39,10 +39,10 @@
 		 equals $N$,then the capacity $c$ is the minimum max load.
 	\item \textbf{Complexity:} 
 		\begin{itemize}
-			\item FORD-FULKERSON costs $O(m^2(N+M))$ time using Edmonds-karp
+			\item FORD-FULKERSON costs $O((3N+M)^2(N+M+2))$ time using Edmonds-karp
 			\item binary search averagely costs $O(\log N)$ time
 		\end{itemize}
-		In summary , it costs $O(\log N m^2(N+M))$ time
+		In summary , it costs $O(\log N (3N+M)^2(N+M+2))$ time
 		\begin{algorithm}[H]
 			\caption{load balance}
 			\begin{algorithmic}[1]
