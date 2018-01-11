@@ -1,0 +1,46 @@
+\section{Problem Reduction}
+
+\begin{itemize}
+	\item \textbf{Description:} 
+		\begin{enumerate}[I.] 
+		 \item construct a graph network with each item of the matrix
+		 $M[i][j]$ as a vertex $v_{i,j}$,
+		 add edges from $v_{i,j}$ to $v_{i+1,j}$ and
+		 $v_{i, j+1}$.Set the capacity $C(u\rightarrow w) = 1$
+		 and cost $W(u\rightarrow v_{i,j}) = M[i][j]$,
+		 let $v_{1,1} = s,v_{m,n} = t$.
+		\item apply minimum cost algorithm (Klen algorithm ) with flow $v = 2$, the sum of cost is minimum.
+		\end{enumerate} 
+		\begin{algorithm}[H]
+			\caption{MinCost}
+			\begin{algorithmic}[1]
+				\Require  Matrix $M_{ij}$ with number that means the costs when walk through a certain point
+				\Ensure   A flow $f$ that contains two path from $s$ to  $t$ without intersection
+				\Function {MinCost} {M}
+				\State construct a network $G$ as discribed above
+				\State $f$ = Ford-Fulkerson($G$)
+				\While {$G_f$ has a negatibe circle $C$}
+					\State $b$ = bottleneck($C$)
+					\State $\hat{f}$ is the unit flow of $C$
+					\State $f = f + b\hat{f}$
+				\EndWhile 
+				\State\Return $f$
+				\EndFunction 
+			\end{algorithmic} 
+		\end{algorithm}			
+		
+	\item \textbf{Correctness:} \\
+	 \begin{itemize}
+	 	\item the capacity of edges equals to $1$,thus one certain vertex can be passed at most once and the value of a single path from $s$ to $t$ can only be $1$
+	 	\item there exist two edges starting from $s$, and the capacity of each edge is $1$,so the maximum flow value is $2$.According to the conclusion that the value of flow of a single path is $1$, there are two different paths from $s$ to $t$ without intersection
+	 \item a path from $s$ to $t$ with a intersection to right or bottom is equivalent to a path from $t$ to $s$ with a direction to top or left. Hence, walking through one of the two path in the flow f in reverse direction, we can get a single path from the top left point to the right bottom point and then return to the top left point with the minimal cost	 
+	 \end{itemize}
+	\item \textbf{Complexity:} \\
+	 \begin{itemize}
+	 	\item there are $2mn-m$ edges in the graph and $C=1$ ,
+		 	so the Ford-Fulkerson costs $O(mn)$ time
+		 \item there are $mn$ vertices in the graph, the time complexity of Bellman-Ford algorithm is $O(m^2n^2)$	
+		\item the number of possible negative circle is at most $O(mn)$
+	 \end{itemize}
+	 Hence, the total time complexity is at most $O(m^3n^3)$.
+\end{itemize} 

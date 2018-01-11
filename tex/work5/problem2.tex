@@ -1,0 +1,57 @@
+\section{Matrix}
+
+\begin{itemize}
+	\item \textbf{Description:} \\
+	 construct the network 
+	\begin{center} 
+		\begin{tikzpicture}
+		\node[vertex] (s)  at (1,4.5)  {s};
+		\node[vertex] (x1)  at (4,6)  {$R_1$};
+		\node[vertex] (x2)  at (4,5)  {$R_2$};
+		\node[vertex] (xn)  at (4,3)  {$R_M$};
+		
+		\node[vertex] (t)  at (10,4.5)  {t};
+		\node[vertex] (y1)  at (7,6)  {$C_1$};
+		\node[vertex] (y2)  at (7,5)  {$C_2$};
+		\node[vertex] (ym) at (7,3)  {$C_N$};
+		
+		\path (x2) -- (xn) node [black, font=\Huge, midway, sloped] {$\dots$};
+		\path (y2) -- (ym) node [black, font=\Huge, midway, sloped] {$\dots$};
+		
+		\foreach \from/\to/\weight in {s/x1/r1, s/x2/r2,  s/xn/rn,
+			x1/y1/1, x1/y2/1, x2/y1/1, x2/y2/1, xn/y2/1, xn/ym/1,
+			x1/ym/1, x2/ym/1, xn/ym/1, xn/y1/1,xn/y2/1}
+		\draw[->] (\from) -- (\to) node [midway, above, blue] {$\weight$};
+		
+		\foreach \from/\to/\weight in {y1/t/c1, y2/t/c2, ym/t/cm}
+		\draw [->] (\from) -- (\to) node [midway, above, blue] {$\weight$};
+		\end{tikzpicture}
+	\end{center} 	 
+	in the network, the capacity of the edge from $s$ to $R_i$ represents the sum of $i$th row,
+	the capacity of the edge from $C_i$ to $t$ represents the sum of $i$th column, the capacity of
+	the edge from $R_i$ to $C_k$ is $1$.
+	Solve the network as a maximum flow problem, if the maximum flow value equals to the sum of all
+	matrix elements then $Matrix[i][j] = f(R_i \rightarrow C_j)$ otherwise no feasible solution.
+		\begin{algorithm}[H]
+			\caption{Matrix}
+			\begin{algorithmic}[1]
+				\Require  the sum of each row and column 
+				\Ensure   a matrix that satisfys the conditions
+				\Function {Matrix} {}
+	 			  \State construct a network as shown above
+	 			  \State find the maximum flow value $val(f)$
+	 			  \If {$val(f) = \sum_i r_i$}
+		 			  \State $Matrix[i][j] = f(R_i \rightarrow C_j)$
+	 			  \Else
+		 			  \State \Return ``no feasible solution''
+		 		  \EndIf
+		 		  \State \Return $Matrix$	  
+				\EndFunction 
+			\end{algorithmic} 
+		\end{algorithm}		
+	
+	\item \textbf{Correctness:} \\
+		 the problem can be formulated as a Circulation problem.
+	\item \textbf{Complexity:} \\
+		the flow value is at most equal to $MN$, so time complexity is $O(M^2N^2)$.	
+\end{itemize} 
