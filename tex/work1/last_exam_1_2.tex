@@ -1,0 +1,36 @@
+\section{local maximum in Array}
+\textbf{Question:}
+Given an input array $num[0,1,\cdots, n-1]$ where $num[i] \neq num[i+1]$ for all $i = 0,1,\cdots, n-2$, suppose $num[-1] = num[n] = -\infty$ .find one local maximum and report its position, for instance $[1,2,3,2,1]$, $3$ is the maximum element and report the index number $2$.give an algorithm with $O(\log n)$ complexity. \\
+\textbf{Solution:}
+ 	\begin{algorithm}[H]
+ 		\caption{find the local maximum in Array}
+ 		\begin{algorithmic}[1]
+ 			\Require An array $num[0,1,\cdots, n-1]$	
+ 			\Ensure  the position of one local maximum
+ 			\Function {local-max}{$nums$, $start$ , $end$}
+	 			\If {$(end - start) <= 1 $}
+		 			\If {$nums[start] > nums[end]$}
+			 			\State \Return $start$
+			 		\Else
+				 		\State \Return $end$
+				 	\EndIf 
+	 			\EndIf
+	 			\State $mid = (start + end)/2$
+	 			\If {$arr[mid] > arr[mid-1] $ and $arr[mid] > arr[mid+1]$}
+		 			\State \Return $mid$
+		 		\ElsIf {$arr[mid] < arr[mid-1]$}
+			 		\State \Return \Call{local-max}{ $nums$, $start$, $mid-1$}
+			 	\Else
+				 	\State \Return \Call{local-max}{$nums$, $mid+1$, $end$}
+				 \EndIf 
+ 			\EndFunction 
+		 \Function {solution} {$num[0,1,\cdots, n-1]$}
+			 \State \Return \Call{local-max}{$num$, $0$, $n-1$}
+		 \EndFunction 	
+ 		\end{algorithmic}	
+ 	\end{algorithm}
+ time complexity:
+  \[
+	  T(n) = T(n/2) + c
+  \]
+  $T(n) = O(\log n)$

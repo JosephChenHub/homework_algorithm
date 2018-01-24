@@ -1,0 +1,12 @@
+\section{local minimum search}
+
+start search from the root of tree $T$, 
+\begin{itemize}
+	\item if $root$ has no children, then return $root$
+	\item if $left < root$, then $root = left$, continue search
+	\item else if $right < root$, then $root = right$, continue search
+	\item else return $root$
+\end{itemize}
+
+the worst condition is that searching from the root to the leaf , 
+which costs $O(\log n)$

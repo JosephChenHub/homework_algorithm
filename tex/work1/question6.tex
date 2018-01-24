@@ -1,0 +1,69 @@
+\section{special inversion counting}
+\textbf{Question:} \\
+Recall the problem of finding the number of inversions. As in the course, we are given a
+sequence of n numbers $a_1,\cdots,a_n$, which we assume are all distinct, and we difine an inversion
+to be a pair $i < j$ such that $a_i > a_j$.
+We motivated the problem of counting inversions as a good measure of how different two
+orderings are. However, one might feel that this measure is too sensitive. Let’s call a pair \textit{a significant inversion} if $i < j$ and $a_i > 3a_j$. Given an $O(nlogn)$ algorithm to count the number of significant inversions between two orderings. \\
+\textbf{Solution:} 
+\begin{enumerate}[a.)]
+	\item \textbf{Algorithm description:} \\
+	Unlike the trivial counting inversion problem, there is a point that how to count the significant inversion, it must be done with $O(n)$.
+	pseudo-code:
+	\begin{algorithm}[H]
+		\caption{counting the special inversion}
+		\begin{algorithmic}[1]
+			\Require An unsorted sequence $a_1, a_2,\dots , a_n$	
+			\Ensure  the inversion number
+			\Function {merge}{$L = \{A_1,A_2,\cdots,A_m\}, R = \{B_1,B_2,\cdots, B_n\}$}
+				\State $inv\_num = 0$, $i = 1$, $j = 1$
+				\While {$i < m$ and $j < n$}
+					\If {$A_i > 3*B_j$ 	}
+						\State $inv\_num = inv\_num + m+1 - i$
+						\State $j = j+1$
+					\Else
+						\State $i = i +1 $
+					\EndIf 
+				\EndWhile
+				\State $C = \{\}$, $i = 1$, $j=1$
+				\For {$k = 1$ to $m+n$}
+					\If {$A_i <= B_j$}
+						\State $append(C,{A_i})$
+					\Else
+						\State $append(C,{B_j})$
+					\EndIf 
+				\EndFor 
+				
+				\State \Return ($inv\_num$, $C$)
+			\EndFunction 
+			
+			\Function {merge-count} {$A = \{a_1,a_2,\cdots, a_n\}$}
+				   \If{$n=1$}
+						\State\Return ($0$, $A$)
+					\EndIf
+				\State split the sequence into two halves $L$, $R$ 
+				\State ($r_L$ , $L$) = \Call{merge-count}{$L$}
+				\State ($r_R$ , $R$) = \Call{merge-count}{$R$}
+				\State ($r_{LR}$, $L'$) = \Call{merge}{$L$, $R$}
+				\State \Return ($r_L + r_R +r_{LR}$, $L'$)
+			\EndFunction 
+		\end{algorithmic}	
+	\end{algorithm}
+	\item \textbf{correctness} 
+		\begin{itemize}
+			\item correctness of ``merge'': since $L$ , $R$ are sorted sequence in ascending order, we scan these two lists. If $A_i > 3B_j$ then $A_i, A_{i+1} ,\cdots A_m > 3B_j$ , there is no need to continue scanning $L$ for $B_j$, then move to $B_{j+1}$, as $B_{j+1} > B_{j}, \forall k <i, A_{k} \leq 3B_j$, thus $A_k \leq 3B_{j+1}$, we just need to scan $L$ from last end point $A_i$ , once we reach each end point of $L$,$R$, we get the inversion number of two sorted lists
+			\item  for an unsorted sequence $A$	, we can split it into two halves $L$, $R$,
+			each part can be reduced into two halves iteratively , then we combine the results of two halves to get the final result.
+			
+			
+		\end{itemize}
+	
+	\item \textbf{time complexity} \\	
+	``merge'' manipulation costs $O(n)$, original problem is divided into two subproblems, thus
+	\[
+		T(n) = 2T(n/2) + O(n)
+	\]
+	$T(n) = O(n\log n)$
+	
+	
+\end{enumerate}
