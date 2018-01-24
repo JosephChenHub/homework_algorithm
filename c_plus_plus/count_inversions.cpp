@@ -8,6 +8,8 @@ g++  count_inversionsc.cpp -o test
 #include <string>
 #include <sys/time.h>  //Linux
 
+const int FACTOR = 3;
+
 /// brute force  O(n^2)
 template<class T>
 size_t brute_getInvCount(T arr[],size_t n)
@@ -17,7 +19,7 @@ size_t brute_getInvCount(T arr[],size_t n)
 	{
 		for(size_t j = i +1; j < n; ++j)
 		{
-			if(arr[i] > arr[j])
+			if(arr[i] > FACTOR*arr[j])
 			{
 				cnt ++;
 			}
@@ -34,7 +36,7 @@ size_t merge_count(T * A, size_t len_a, T * B, size_t len_b,T * &list)
 	{
 		list =new T[len_a + len_b];
 	}
-
+	/*
 	if(len_a == 0)
 	{
 		for(int i = 0; i < len_b; ++i)
@@ -52,29 +54,41 @@ size_t merge_count(T * A, size_t len_a, T * B, size_t len_b,T * &list)
 		}
 		return 0;
 	}
-		
-	size_t m = 0, n = 0;
+	*/
+
 	size_t inv = 0;
-	for(int i = 0; i < len_a+len_b; ++i)
+	//count O(n)
+	for(int i = 0, j = 0; i < len_b && j < len_a; )
 	{
-		if(A[m] > B[n] && n < len_b) //inversion
+		if(A[j] > FACTOR*B[i])
 		{
-			inv += len_a - m;
-			list[i] = B[n++];
+			inv += len_a - j;
+			i ++;
 		}
-		else if(A[m] <= B[n] && m < len_a)
+		else
 		{
-		
-			list[i] = A[m++];
+			j++;
 		}
-		else if(n >= len_b && m < len_a) //if A[m] > all of B,then push A[m++] until the end
+	}
+	//sort  O(n)
+	size_t m = 0, n = 0;
+	for(size_t k = 0, i = 0; i < len_a+len_b ; ++i)
+	{
+		if(m >= len_a)
 		{
-			list[i] = A[m++];
+			list[k++] = B[n++];
 		}
-		else if(m >= len_a && n < len_b) //B[n] >all of A,then push B[n++] until the end
+		else if(n >= len_b)
 		{
-			list[i] = B[n++];
-			
+			list[k++] = A[m++];
+		}
+		else if(A[m] <= B[n])
+		{
+			list[k++] = A[m++];
+		}
+		else
+		{
+			list[k++] = B[n++];
 		}
 	}
 		
@@ -95,12 +109,9 @@ size_t sort_count(T * list,size_t len,T * &out)
 		return 0;
 	}	
 
-
 	///divide list into two parts
 	T * left = new T[len/2];
 	T * right = new T[len-len/2];
-	
-
 
 	size_t r1 = sort_count(list,len/2,left);
 	size_t r2 = sort_count(list+len/2,len - len/2,right);
@@ -136,7 +147,7 @@ int main(int argc,char * argv[])
 	file.close();
 	size--;
 	std::cout<<"read "<<size<<" numbers"<<std::endl;
-	
+
 
 	int *list = new int[100000];
 	//test time
