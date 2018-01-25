@@ -1,0 +1,13 @@
+\section{Integer Programming}
+
+\textbf{Proof:} \\
+\begin{itemize}
+	\item Certificate: we can verify the constraints $Ax \geq b $ in polynomial time, thus it is a NP problem;
+	\item NP-hard: Now we show that $\text{3-SAT} \leq_{P} \text{Integer Programming}$.
+	Let $C_i$($i=1,2,...,m$) be the clauses of 3-SAT problem $\phi = C_1 \wedge C_2 \wedge \cdots \wedge C_m$, $x = (x_1,x_2,...,x_n)$.Once we construct a matrix $A$ and $b$ that each clause $C_i$ can be True or False corresponding to the True or False of the constraint $ a_{i1}x_1 + a_{i2}x_2 + ... + a_{in}x_n \geq b_i$
+	, then $\phi$ is satisfied iff $Ax \geq b$ holds. \\
+	For instance, $m=3$, $n =4$, $x_i = \{0,1\}$, $\phi =  (x_1 \vee x_2 \vee \neg x_3) \wedge (\neg x_1 \vee x_2 \vee x_4   ) \wedge (x_2 \vee x_3 \vee   x_4)$.  The corresponding constraints are $x_1 + x_2 + (1-x_3) \geq 1$,	$(1-x_1) + x_2 + x_4 \geq 1$ and 
+	$ x_2 + x_3 + x_4 \geq 1$,
+	we can easily construct the matrix $A$ and $b$ by rewriting the constraints.Thus $3$-SAT is polynomially reducible to the Integer programming. 
+\end{itemize}
+Hence , the Integer Programming problem is in NP-complete.
