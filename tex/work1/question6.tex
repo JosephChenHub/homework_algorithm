@@ -17,7 +17,7 @@ orderings are. However, one might feel that this measure is too sensitive. Letâ€
 			\Ensure  the inversion number
 			\Function {merge}{$L = \{A_1,A_2,\cdots,A_m\}, R = \{B_1,B_2,\cdots, B_n\}$}
 				\State $inv\_num = 0$, $i = 1$, $j = 1$
-				\While {$i < m$ and $j < n$}
+				\While {$i <= m$ and $j <= n$}
 					\If {$A_i > 3*B_j$ 	}
 						\State $inv\_num = inv\_num + m+1 - i$
 						\State $j = j+1$

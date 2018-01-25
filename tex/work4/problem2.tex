@@ -42,7 +42,8 @@
  thus
  \[ \begin{split} 
 	 g(\lambda,\alpha,\varphi, \phi) &= \inf_{z,x} L(z,x,\lambda, \alpha, \varphi, \phi)  \\ 
-	 &= z(1 - \sum_{i=1}^{n}\varphi_i+ \phi)  + x_1(\lambda_1 - \alpha_1 + \varphi_1) + x_n(\lambda_n - \alpha_n - \varphi_{n-1})
+	 &= z(1 - \sum_{i=1}^{n}\varphi_i+ \phi)  + x_1(\lambda_1 - \alpha_1 + \varphi_1) + x_n(\lambda_n - \alpha_n - \varphi_{n-1}) + \\
+	 &\quad \sum_{i=2}^{n-1} x_i(\lambda_i - \alpha_i + \varphi_i - \varphi_{i-1})
 	 - \sum_{i=1}^{n}\lambda_i t_i + \sum_{i=1}^{n} \alpha_i s_i \\
 	 &= - \sum_{i=1}^{n}\lambda_i t_i + \sum_{i=1}^{n} \alpha_i s_i
 	 \end{split}
