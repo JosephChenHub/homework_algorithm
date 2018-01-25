@@ -1,63 +1,18 @@
-\section{Problem 3}
-\begin{enumerate}[a).]
-	\item \textbf{Description}	\\
-	\textbf{Goal:}\qquad given two strings $s$ and $t$, check whether $s$ is subsequence of $t$. \\
-	\textbf{Solution:}  let $m,n$ be the length of $s,t$ respectively and $j = 0$,
-	then scan the string $t$ from start to end using index $i$, 	 
-	$j = j + 1$ when $t[i] = s[j]$.Finally , if $j$ is equivalent to the length of $m$,that means
-	$s$ is the subsequence of $t$;otherwise, $s$ is not the subsequence of $t$.
-	\textbf{pseudo-code:} 
-	\begin{algorithm}[H]
-		\caption{Is subsequence}
-		\begin{algorithmic}[1]
-			\Require\quad two string $s,t$
-			\Ensure  whether $s$ is subsequence of $t$	
-			\Function {isSubsequence}{$s,t$}
-			\State initialize $m = \text{len}(s), n = \text{len}(t), j = 0$
-			\For {$i = 0$ to $n-1$}
-			\If { $s[j] = t[i] $}
-			\State $j = j +1 $
-			\EndIf 
-			\EndFor 
-			\If {$j = m$}
-			\State \Return true
-			\Else
-			\State \Return false
-			\EndIf 				 
-			\EndFunction 
-		\end{algorithmic} 
-	\end{algorithm}
-	\item \textbf{Greedy choice property and optimal structure} \\
-	If $s$ is the subsequence of $t$, then the substring of $s$ should be the subsequence of $t$.	
-	In words, given $s = \left\lbrace s_0s_1...s_{m-1}\right\rbrace$ , 
-	let $s' = \left\lbrace {s_0 s_1 ... s_{j-1}}\right\rbrace \subset s$ be the subsequence of $t$, 
-	$t' = t - \left\lbrace{t_0 t_1 ... t_k}\right\rbrace $, $s'$ is the subsequence of substring 
-	$\left\lbrace{t_0 t_1 ... t_k}\right\rbrace$ which has 
-	the minimum length.
-	If $s_{j}$ can be found in the remainder substring $t'$,
-	we add $s_{j}$ to the subset $s'$.
-	Finally,  $s$ is the subsequence of $t$ if and only if $s' = s$. \\
-	the optimal structure can be written as 
-	\[
-	s' = \left\lbrace \begin{split}
-	s'\cup {\left\lbrace s_j \right\rbrace} , &\text{if } s_j \in t' \\
-	s', &\text{otherwise} 
-	\end{split} 
-	\right.  
-	\]
-	\item \textbf{correctness} \\
-	suppose that we obtain a optimal substring $s' = \left\lbrace s_0s_1...s_{k}\right\rbrace \subset s$ 
-	using the method mentioned above,
-	but there exists an another optimal substring $s''  \subset s$ .
+\section{Problem 1}
+\textbf{Question:} \\
+Given a list of $n$ natural numbers $d_1,d_2,\cdots,d_n$, show how to decide in polynomial time whether there exists an undirected graph $G = (V, E)$ whose node degrees are precisely the numbers $d_1, d_2,\cdots ,d_n$. $G$ should not contain multiple edges between the same pair of nodes, or ``loop" edges with both endpoints equal to the same node. \\
+\textbf{Solution:} 
+\begin{enumerate}
+	\item initialize $d[n] = \{d_1,d_2,\cdots,d_n\}$, $flag = True$
+	\item for $i = 1$ to $n$, 
 	\begin{itemize}
-		\item If $\text{len}(s'') \leq \text{len}(s')$, $s'$ is the final optimal substring.
-		\item If $\text{len}(s'') > \text{len}(s')$, suppose that $s'' = \left\lbrace s_0s_1...s_{k}s_{k+1}s_{k+2}...\right\rbrace \subset s$.However, $s'$ is the subsequence of $t - t'$ and $s_{k+1}　\in t'$, according to the rule above,
-		$s_{k+1}$ should be added to $s'$, the same condition is also applied to $s_{k+2},s_{k+3},...$,
-		which is contrary to the hypothesis.
-		Thus $s'$ should be equivalent to $s''$.
+		\item  sort $d[n]$ in descending order, choose $d[0]$ to add edges, if $d[0] = 0$ break 
+		\item  $d[k] = d[k] -1$, $k = 1,2,\cdots, d[0]$,
+		if $d[k] < 0$ then $flag = False$, stop 
+		\item $d[0] = 0$
 	\end{itemize}
-	In summary, $s'$ is the final optimal subsequence of $t$,Hence the algorithm is correct.
-	\item \textbf{complexity} \\
-	it costs $O(n)$ time.	
-	
-\end{enumerate}	
+	\item if $flag = True$, there exists such a graph;otherwise , no graph can meet the needs.
+\end{enumerate}
+\textbf{Correctness:} \\
+\textbf{Time complexity:}\\
+using quick-sort costs $O(n\log n)$, thus the time complexity is $O(n^2 \log n)$.

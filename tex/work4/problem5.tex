@@ -1,0 +1,12 @@
+\section{Stable Matching Problem}
+Let $x_{ij}$ be the stable matching status of man $i$ and women $j$,if $x_{ij} = 1$ the status is stable;otherwise the status is unstable.
+ILP form 
+\[
+	\begin{split}
+		\max &\quad 0 \\
+		\text{s.t.} &\quad x_{ij} \in\{0,1\} , i = 1,2,\cdots, n, j = 1,2,\cdots, n \\
+		&\quad \sum_{j=1}^{n} x_{ij} = 1 , i = 1,2,\cdots, n \\
+		&\quad \sum_{i=1}^{n} x_{ij} = 1, j = 1,2,\cdots, n \\
+		&\quad x_{ij} + x_{kl} \leq S_{i,j,k,l} + 1
+	\end{split} 
+\]

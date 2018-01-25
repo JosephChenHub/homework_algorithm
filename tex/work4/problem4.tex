@@ -1,0 +1,18 @@
+\section{Gas Station Placement}
+the question is to solve
+\[
+	\begin{split}
+		\min &\quad \max(x_2-x_1, x_3-x2, \cdots, x_n - x_{n-1}) \\
+	    \text{s.t.} &\quad |x_i - d_i| \leq r, i = 1,2,\cdots, n
+	\end{split} 
+\]
+the LP form
+\[
+	\begin{split}
+		\min &\quad z \\
+		\text{s.t.} &\quad  x_i - d_i \leq r, i = 1,2,\cdots, n \\
+		&\quad -x_i + d_i \leq r , i = 1,2,\cdots, n\\
+		&\quad x_{k+1} - x_k \leq z, k = 1,2,\cdots, n-1
+	\end{split} 
+\]
+

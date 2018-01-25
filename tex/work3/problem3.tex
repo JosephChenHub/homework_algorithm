@@ -1,7 +1,63 @@
-\section{Problem 5 Huffman code}
-the result is showed below, the compression ratio is near 0.5.
-\begin{figure}[H]
-	\centering
-	\includegraphics[width=\textwidth, height = 0.25\textheight]{./work3/huffman}
-\end{figure}
- 
+\section{Problem 3--subsequence}
+\begin{enumerate}[a).]
+	\item \textbf{Description}	\\
+	\textbf{Goal:}\qquad given two strings $s$ and $t$, check whether $s$ is subsequence of $t$. \\
+	\textbf{Solution:}  let $m,n$ be the length of $s,t$ respectively and $j = 0$,
+	then scan the string $t$ from start to end using index $i$, 	 
+	$j = j + 1$ when $t[i] = s[j]$.Finally , if $j$ is equivalent to the length of $m$,that means
+	$s$ is the subsequence of $t$;otherwise, $s$ is not the subsequence of $t$.
+	\textbf{pseudo-code:} 
+	\begin{algorithm}[H]
+		\caption{Is subsequence}
+		\begin{algorithmic}[1]
+			\Require\quad two string $s,t$
+			\Ensure  whether $s$ is subsequence of $t$	
+			\Function {isSubsequence}{$s,t$}
+			\State initialize $m = \text{len}(s), n = \text{len}(t), j = 0$
+			\For {$i = 0$ to $n-1$}
+			\If { $s[j] = t[i] $}
+			\State $j = j +1 $
+			\EndIf 
+			\EndFor 
+			\If {$j = m$}
+			\State \Return true
+			\Else
+			\State \Return false
+			\EndIf 				 
+			\EndFunction 
+		\end{algorithmic} 
+	\end{algorithm}
+	\item \textbf{Greedy choice property and optimal structure} \\
+	If $s$ is the subsequence of $t$, then the substring of $s$ should be the subsequence of $t$.	
+	In words, given $s = \left\lbrace s_0s_1...s_{m-1}\right\rbrace$ , 
+	let $s' = \left\lbrace {s_0 s_1 ... s_{j-1}}\right\rbrace \subset s$ be the subsequence of $t$, 
+	$t' = t - \left\lbrace{t_0 t_1 ... t_k}\right\rbrace $, $s'$ is the subsequence of substring 
+	$\left\lbrace{t_0 t_1 ... t_k}\right\rbrace$ which has 
+	the minimum length.
+	If $s_{j}$ can be found in the remainder substring $t'$,
+	we add $s_{j}$ to the subset $s'$.
+	Finally,  $s$ is the subsequence of $t$ if and only if $s' = s$. \\
+	the optimal structure can be written as 
+	\[
+	s' = \left\lbrace \begin{split}
+	s'\cup {\left\lbrace s_j \right\rbrace} , &\text{if } s_j \in t' \\
+	s', &\text{otherwise} 
+	\end{split} 
+	\right.  
+	\]
+	\item \textbf{correctness} \\
+	suppose that we obtain a optimal substring $s' = \left\lbrace s_0s_1...s_{k}\right\rbrace \subset s$ 
+	using the method mentioned above,
+	but there exists an another optimal substring $s''  \subset s$ .
+	\begin{itemize}
+		\item If $\text{len}(s'') \leq \text{len}(s')$, $s'$ is the final optimal substring.
+		\item If $\text{len}(s'') > \text{len}(s')$, suppose that $s'' = \left\lbrace s_0s_1...s_{k}s_{k+1}s_{k+2}...\right\rbrace \subset s$.However, $s'$ is the subsequence of $t - t'$ and $s_{k+1}\in t'$, according to the rule above,
+		$s_{k+1}$ should be added to $s'$, the same condition is also applied to $s_{k+2},s_{k+3},...$,
+		which is contrary to the hypothesis.
+		Thus $s'$ should be equivalent to $s''$.
+	\end{itemize}
+	In summary, $s'$ is the final optimal subsequence of $t$,Hence the algorithm is correct.
+	\item \textbf{complexity} \\
+	it costs $O(n)$ time.	
+	
+\end{enumerate}	

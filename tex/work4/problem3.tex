@@ -1,6 +1,11 @@
-\section{Dual Simplex Algorithm}
-the result is showed below.
-\begin{figure}[H]
-	\centering
-	\includegraphics[width = 0.8\textwidth]{work4/simplex}
-\end{figure}
+\section{Interval Scheduling Problem}
+Let $x_{ij}$ be the status of course $j$ scheduled in classroom $i$, if $x_{ij} = 1$ status is $Yes$, otherwise status is $No$.
+
+\[
+	\begin{split}
+		\max & \quad \sum_{i=1}^{m} \sum_{j=1}^{n} x_{ij} \\
+		\text{s.t.} & \quad x_{ij} \in \{0,1 \} , i=1,2,\cdots, m , j = 1,2,\cdots, n \\
+		&\quad  \sum_{i=1}^{m}x_{ij} \leq 1 , j =1,2,\cdots, n \\
+		&\quad F_j(x_{ij} + x_{ik} - 1  ) \leq S_k,  1\leq j \leq k \leq n
+	\end{split}
+\]
